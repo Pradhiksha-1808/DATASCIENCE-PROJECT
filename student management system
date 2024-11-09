@@ -1,0 +1,140 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Student {
+    int id;
+    char name[50];
+    int age;
+    char grade[5];
+} Student;
+
+typedef struct Node {
+    Student student;
+    struct Node* next;
+} Node;
+void addStudent(Node** head);
+void deleteStudent(Node** head, int id);
+void displayStudents(Node* head);
+Node* searchStudent(Node* head, int id);
+void freeList(Node* head);
+void addStudent(Node** head) {
+    Node* new_node = (Node*)malloc(sizeof(Node));
+    if (!new_node) {
+        printf("Memory allocation failed\n");
+        return;
+    }
+    printf("Enter Student ID: ");
+    scanf("%d", &new_node->student.id);
+    printf("Enter Student Name: ");
+    scanf("%s", new_node->student.name);
+    printf("Enter Student Age: ");
+    scanf("%d", &new_node->student.age);
+    printf("Enter Student Grade: ");
+    scanf("%s", new_node->student.grade);
+
+    new_node->next = *head;
+    *head = new_node;
+    printf("Student added successfully!\n");
+}
+
+void deleteStudent(Node** head, int id) {
+    Node *temp = *head, *prev = NULL;
+
+    if (temp != NULL && temp->student.id == id) {
+        *head = temp->next;
+        free(temp);
+        printf("Student deleted successfully!\n");
+        return;
+    }    while (temp != NULL && temp->student.id != id) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        printf("Student with ID %d not found\n", id);
+        return;
+    }
+
+    prev->next = temp->next;
+    free(temp);
+    printf("Student deleted successfully!\n");
+}
+
+void displayStudents(Node* head) {
+    Node* current = head;
+    while (current != NULL) {
+        printf("ID: %d, Name: %s, Age: %d, Grade: %s\n",
+               current->student.id, current->student.name,
+               current->student.age, current->student.grade);
+        current = current->next;
+    }
+}
+
+Node* searchStudent(Node* head, int id) {
+    Node* current = head;
+    while (current != NULL) {
+        if (current->student.id == id) {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
+void freeList(Node* head) {
+    Node* tmp;
+    while (head != NULL) {
+        tmp = head;
+        head = head->next;
+        free(tmp);
+    }
+}
+int main() {
+    Node* head = NULL;
+    int choice, id;
+    Node* result;
+
+    while (1) {        printf("\nSchool Management System\n");
+        printf("1. Add Student\n");
+        printf("2. Delete Student\n");
+        printf("3. Display Students\n");
+        printf("4. Search Student\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                addStudent(&head);
+                break;
+            case 2:
+                printf("Enter Student ID to delete: ");
+                scanf("%d", &id);
+                deleteStudent(&head, id);
+                break;
+            case 3:
+                displayStudents(head);
+                break;
+            case 4:
+                printf("Enter Student ID to search: ");
+                scanf("%d", &id);
+                result = searchStudent(head, id);
+                if (result) {
+                    printf("Student found: ID: %d, Name: %s, Age: %d, Grade: %s\n",
+                           result->student.id, result->student.name,
+                           result->student.age, result->student.grade);
+                } else {
+                    printf("Student with ID %d not found\n", id);
+                }
+                break;
+            case 5:
+                freeList(head);
+                exit(0);
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
+    return 0;
+}
+
